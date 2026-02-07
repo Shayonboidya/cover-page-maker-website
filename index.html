@@ -310,6 +310,32 @@
       z-index:2;
     }
 
+    /* ========================= */
+    /* ✅ ADDED ONLY: MOBILE FIX */
+    /* ========================= */
+
+    /* Wrapper for preview so mobile can pan/scroll full A4 */
+    .pageViewport{
+      width: 100%;
+    }
+
+    @media (max-width: 900px){
+      /* stack form + preview vertically */
+      .wrap{
+        flex-direction: column;
+        align-items: center;
+      }
+      /* allow scrolling/panning the page */
+      .pageViewport{
+        overflow: auto;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 10px;
+      }
+      .page{
+        margin: 0 auto;
+      }
+    }
+
     @media print{
       body{ background:#fff; }
       .topbar, .form{ display:none !important; }
@@ -445,68 +471,71 @@
     </div>
 
     <!-- Preview -->
-    <div class="page" id="page">
-      <div class="watermark" id="wmLayer">
-        <img id="wmImg" alt="Watermark" />
-      </div>
-
-      <div class="content">
-        <div class="logoRow">
-          <img id="logoImg" class="logo" alt="Logo" />
+    <!-- ✅ ADDED ONLY: wrapper for mobile pan/scroll -->
+    <div class="pageViewport">
+      <div class="page" id="page">
+        <div class="watermark" id="wmLayer">
+          <img id="wmImg" alt="Watermark" />
         </div>
 
-        <div class="uni" id="uniNamePreview"></div>
-        <div class="titleBig">ASSIGNMENT</div>
-
-        <div class="metaCenter">
-          <div class="line"><span class="k">Assignment No:</span> <span id="assignmentNoPreview"></span></div>
-          <div class="line"><span class="k">Course Code:</span> <span id="courseCodePreview"></span></div>
-          <div class="line"><span class="k">Course Title:</span> <span id="courseTitlePreview"></span></div>
-          <div class="sub">Level <span id="levelPreview"></span>; Semester <span id="semesterPreview"></span></div>
-
-          <!-- Topic (middle align) -->
-          <div class="topicWrap" id="topicWrap">
-            <div class="topicChip"><span class="k">Topic:</span> <span id="topicPreview"></span></div>
+        <div class="content">
+          <div class="logoRow">
+            <img id="logoImg" class="logo" alt="Logo" />
           </div>
-        </div>
 
-        <div class="stack">
-          <div class="box" id="byBox">
-            <div class="boxTitle by">SUBMITTED BY</div>
+          <div class="uni" id="uniNamePreview"></div>
+          <div class="titleBig">ASSIGNMENT</div>
 
-            <div class="byContent">
-              <div class="byLine"><span class="k">Name:</span> <span id="byNamePreview"></span></div>
-              <div class="byLine"><span class="k">ID No:</span> <span id="byIdPreview"></span></div>
-              <div class="byLine"><span class="k">Reg No:</span> <span id="byRegPreview"></span></div>
-              <div class="byLine"><span class="k">Session:</span> <span id="bySessionPreview"></span></div>
+          <div class="metaCenter">
+            <div class="line"><span class="k">Assignment No:</span> <span id="assignmentNoPreview"></span></div>
+            <div class="line"><span class="k">Course Code:</span> <span id="courseCodePreview"></span></div>
+            <div class="line"><span class="k">Course Title:</span> <span id="courseTitlePreview"></span></div>
+            <div class="sub">Level <span id="levelPreview"></span>; Semester <span id="semesterPreview"></span></div>
 
-              <div class="byLine" id="byDeptLine"><span class="k">Department:</span> <span id="byDeptPreview"></span></div>
+            <!-- Topic (middle align) -->
+            <div class="topicWrap" id="topicWrap">
+              <div class="topicChip"><span class="k">Topic:</span> <span id="topicPreview"></span></div>
             </div>
-
-            <div class="byFaculty" id="byFacultyPreview"></div>
           </div>
 
-          <div class="box" id="toBox">
-            <div class="boxTitle to">SUBMITTED TO</div>
+          <div class="stack">
+            <div class="box" id="byBox">
+              <div class="boxTitle by">SUBMITTED BY</div>
 
-            <div class="toGrid">
-              <div class="toCard" id="t1Card">
-                <div class="toName" id="t1NamePreview"></div>
-                <div class="toDept" id="t1DeptPreview"></div>
+              <div class="byContent">
+                <div class="byLine"><span class="k">Name:</span> <span id="byNamePreview"></span></div>
+                <div class="byLine"><span class="k">ID No:</span> <span id="byIdPreview"></span></div>
+                <div class="byLine"><span class="k">Reg No:</span> <span id="byRegPreview"></span></div>
+                <div class="byLine"><span class="k">Session:</span> <span id="bySessionPreview"></span></div>
+
+                <div class="byLine" id="byDeptLine"><span class="k">Department:</span> <span id="byDeptPreview"></span></div>
               </div>
 
-              <div class="toCard" id="t2Card">
-                <div class="toName" id="t2NamePreview"></div>
-                <div class="toDept" id="t2DeptPreview"></div>
-              </div>
+              <div class="byFaculty" id="byFacultyPreview"></div>
             </div>
 
-            <div class="toFaculty" id="toFacultyPreview"></div>
+            <div class="box" id="toBox">
+              <div class="boxTitle to">SUBMITTED TO</div>
+
+              <div class="toGrid">
+                <div class="toCard" id="t1Card">
+                  <div class="toName" id="t1NamePreview"></div>
+                  <div class="toDept" id="t1DeptPreview"></div>
+                </div>
+
+                <div class="toCard" id="t2Card">
+                  <div class="toName" id="t2NamePreview"></div>
+                  <div class="toDept" id="t2DeptPreview"></div>
+                </div>
+              </div>
+
+              <div class="toFaculty" id="toFacultyPreview"></div>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div class="footerDT" id="footerDTPreview"></div>
+        <div class="footerDT" id="footerDTPreview"></div>
+      </div>
     </div>
   </div>
 
