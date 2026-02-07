@@ -1,0 +1,667 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Assignment Cover Builder</title>
+  <style>
+    :root{
+      --page-w: 794px;
+      --page-h: 1123px;
+      --pad: 44px;
+
+      --c1:#0b3a82;
+      --c2:#7a1f7a;
+      --c3:#0a6b5a;
+      --c4:#a14a00;
+
+      --wmOpacity: 0.10;
+      --boxBg: rgba(255,255,255,0.82);
+    }
+
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      background:#f3f4f6;
+      font-family:"Times New Roman", Georgia, serif;
+      color:#111;
+    }
+
+    /* Top bar */
+    .topbar{
+      position: sticky;
+      top:0;
+      z-index:10;
+      background:#fff;
+      border-bottom:1px solid #ddd;
+      padding:14px 16px;
+      display:flex;
+      gap:14px;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:space-between;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    }
+    .controls{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+    .controls label{
+      font-size:13px;
+      color:#222;
+      display:flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 10px;
+      border:1px solid #ddd;
+      border-radius:10px;
+      background:#fff;
+    }
+    .controls input[type="file"]{ width:210px; }
+    .btn{
+      border:1px solid #111;
+      background:#111;
+      color:#fff;
+      padding:8px 12px;
+      border-radius:10px;
+      cursor:pointer;
+      font-size:13px;
+    }
+    .btn.secondary{ background:#fff; color:#111; }
+
+    /* Layout */
+    .wrap{
+      display:flex;
+      gap:22px;
+      padding:18px;
+      align-items:flex-start;
+      justify-content:center;
+    }
+
+    /* Editor */
+    .form{
+      width: 400px;
+      background:#fff;
+      border:1px solid #e5e7eb;
+      border-radius:14px;
+      padding:14px;
+      box-shadow: 0 6px 18px rgba(0,0,0,.06);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    }
+    .form h3{
+      margin:0 0 10px;
+      font-size:14px;
+      font-weight:800;
+    }
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:10px;
+    }
+    .field{ display:flex; flex-direction:column; gap:6px; }
+    .field label{ font-size:12px; font-weight:700; }
+    .field input, .field textarea{
+      border:1px solid #d1d5db;
+      border-radius:10px;
+      padding:8px 10px;
+      font-size:13px;
+      outline:none;
+      width:100%;
+      background:#fff;
+    }
+    .field textarea{
+      resize:none;
+      min-height: 36px;
+      line-height:1.25;
+    }
+    .full{ grid-column: 1 / -1; }
+    .note{
+      margin-top:10px;
+      font-size:12px;
+      color:#222;
+      background:#fff7ed;
+      border:1px solid #fed7aa;
+      padding:10px;
+      border-radius:10px;
+      line-height:1.35;
+      display:none;
+    }
+
+    /* Page preview */
+    .page{
+      width: var(--page-w);
+      min-height: var(--page-h);
+      background:#fff;
+      position:relative;
+      padding: var(--pad);
+      overflow:hidden;
+
+      border: 2.5px solid #111;
+      box-shadow: 0 18px 40px rgba(0,0,0,.12);
+      outline: 1.5px solid #111;
+      outline-offset: -12px;
+      border-radius: 6px;
+    }
+
+    /* Straight watermark (real img layer) */
+    .watermark{
+      position:absolute;
+      inset:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      pointer-events:none;
+      z-index:0;
+    }
+    .watermark img{
+      width:70%;
+      max-width:540px;
+      height:auto;
+      opacity: var(--wmOpacity);
+      display:none; /* shows after upload */
+    }
+    .watermark.off img{ display:none !important; }
+
+    .content{ position:relative; z-index:1; padding-bottom: 46px; } /* footer room */
+
+    .logoRow{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      min-height: 78px;
+      margin-top: 6px;
+      margin-bottom: 6px;
+    }
+    .logo{
+      width: 90px;
+      height: 90px;
+      object-fit: contain;
+      display:none;
+    }
+
+    .uni{
+      text-align:center;
+      font-size: 30px;
+      font-weight: 900;
+      margin: 10px 0 10px;
+      color: var(--c1);
+      letter-spacing: .3px;
+    }
+
+    .titleBig{
+      text-align:center;
+      font-size: 26px;
+      font-weight: 900;
+      margin: 6px 0 14px;
+      letter-spacing: 2px;
+      color: var(--c2);
+      text-transform: uppercase;
+    }
+
+    .metaCenter{
+      text-align:center;
+      margin: 6px 0 10px;
+      font-size: 18px;
+      line-height:1.25;
+    }
+    .metaCenter .line{ margin: 6px 0; font-weight:800; }
+    .metaCenter .k{ color: var(--c3); }
+    .metaCenter .sub{ font-weight:800; color: var(--c4); }
+
+    /* Topic: bigger + stylish + colorful + middle */
+    .topicWrap{
+      display:none;
+      text-align:center;
+      margin-top: 14px;
+    }
+    .topicChip{
+      display:inline-block;
+      font-size: 22px;
+      font-weight: 900;
+      color: var(--c4);
+      padding: 6px 14px;
+      border-radius: 999px;
+      border: 2px solid rgba(161,74,0,.65);
+      background: rgba(161,74,0,.06);
+      max-width: 92%;
+      word-break: break-word;
+    }
+    .topicChip .k{ color: var(--c3); }
+
+    /* Boxes: centered, not full width, translucent */
+    .stack{
+      margin-top: 22px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap: 18px;
+    }
+    .box{
+      border: 2px solid #111;
+      border-radius: 10px;
+      padding: 14px 18px;
+      background: var(--boxBg);
+      max-width: 560px;
+      width: fit-content;
+    }
+    .boxTitle{
+      text-align:center;
+      font-size: 22px;
+      font-weight: 900;
+      letter-spacing: .6px;
+      margin: 0 0 10px;
+      text-transform: uppercase;
+    }
+    .boxTitle.by{ color: var(--c1); }
+    .boxTitle.to{ color: var(--c2); }
+
+    /* Submitted By: centered content */
+    .byContent{
+      text-align:center;
+      font-size: 18px;
+      line-height: 1.35;
+      word-break: break-word;
+    }
+    .byLine .k{
+      font-weight:900;
+      color: var(--c3);
+    }
+    .byFaculty{
+      margin-top: 10px;
+      text-align:center;
+      font-weight: 900;
+      color: var(--c4);
+      word-break: break-word;
+    }
+    .hide{ display:none !important; }
+
+    /* Submitted To: two teachers side-by-side, labels hidden on page */
+    .toGrid{
+      display:flex;
+      gap: 18px;
+      justify-content:center;
+      align-items:flex-start;
+      flex-wrap:wrap;
+      font-size: 18px;
+      line-height: 1.25;
+      text-align:center;
+      word-break: break-word;
+    }
+    .toCard{
+      min-width: 220px;
+      max-width: 260px;
+    }
+    .toName{ font-weight:900; color: var(--c3); margin-bottom: 4px; }
+    .toDept{ font-weight:700; color:#111; margin-top: 6px; }
+    .toFaculty{
+      margin-top: 12px;
+      text-align:center;
+      font-weight:900;
+      color: var(--c4);
+      word-break: break-word;
+    }
+
+    /* Footer date-time (very bottom middle) */
+    .footerDT{
+      position:absolute;
+      left:0; right:0;
+      bottom: 4px;              /* more down */
+      text-align:center;
+      font-size: 14px;
+      font-weight: 700;
+      color:#222;
+      z-index:2;
+    }
+
+    /* ========================= */
+    /* ✅ ADDED ONLY: MOBILE FIX */
+    /* ========================= */
+
+    /* Wrapper for preview so mobile can pan/scroll full A4 */
+    .pageViewport{
+      width: 100%;
+    }
+
+    @media (max-width: 900px){
+      /* stack form + preview vertically */
+      .wrap{
+        flex-direction: column;
+        align-items: center;
+      }
+      /* allow scrolling/panning the page */
+      .pageViewport{
+        overflow: auto;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 10px;
+      }
+      .page{
+        margin: 0 auto;
+      }
+    }
+
+    @media print{
+      body{ background:#fff; }
+      .topbar, .form{ display:none !important; }
+      .wrap{ padding:0 !important; margin:0 !important; display:block !important; }
+      .page{
+        box-shadow:none;
+        width:auto;
+        min-height:auto;
+        border:none;
+        outline:none;
+        border-radius:0;
+        padding: var(--pad);
+      }
+      /* keep footer at very bottom in print too */
+      .footerDT{ bottom: 4px; }
+      @page{ size: A4; margin: 14mm; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="topbar">
+    <div class="controls">
+      <label>Logo Upload <input id="logoInput" type="file" accept="image/*" /></label>
+      <label>Watermark <input id="wmToggle" type="checkbox" checked /></label>
+      <label>Watermark Opacity <input id="wmOpacity" type="range" min="0" max="25" value="10" /></label>
+    </div>
+    <div class="controls">
+      <button class="btn secondary" id="resetBtn" type="button">Reset</button>
+      <button class="btn" id="printBtn" type="button">Print / Save PDF</button>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <!-- Editor -->
+    <div class="form">
+      <h3>Edit Fields</h3>
+
+      <div class="grid">
+        <div class="field full">
+          <label>University Name</label>
+          <textarea data-ta data-bind="uniName">Patuakhali Science and Technology University</textarea>
+        </div>
+
+        <div class="field">
+          <label>Assignment No</label>
+          <input data-bind="assignmentNo" value="01" />
+        </div>
+        <div class="field">
+          <label>Course Code</label>
+          <input data-bind="courseCode" value="CCE-112" />
+        </div>
+
+        <div class="field full">
+          <label>Course Title</label>
+          <input data-bind="courseTitle" value="Engineering Drawing" />
+        </div>
+
+        <div class="field">
+          <label>Level</label>
+          <input data-bind="level" value="01" />
+        </div>
+        <div class="field">
+          <label>Semester</label>
+          <input data-bind="semester" value="01" />
+        </div>
+
+        <div class="field full">
+          <label>Topic (optional)</label>
+          <textarea data-ta data-bind="topic" placeholder="Write your topic..."></textarea>
+        </div>
+
+        <div class="field full"><label>Submitted By</label></div>
+        <div class="field">
+          <label>Name</label>
+          <input data-bind="byName" value="Shayon Boidya" />
+        </div>
+        <div class="field">
+          <label>ID No</label>
+          <input data-bind="byId" value="2402017" />
+        </div>
+        <div class="field">
+          <label>Reg No</label>
+          <input data-bind="byReg" value="12849" />
+        </div>
+        <div class="field">
+          <label>Session</label>
+          <input data-bind="bySession" value="2024-2025" />
+        </div>
+        <div class="field full">
+          <label>Department (optional)</label>
+          <input data-bind="byDept" placeholder="Leave blank if not needed" />
+        </div>
+        <div class="field full">
+          <label>Faculty (always show on page)</label>
+          <input data-bind="byFaculty" value="Faculty of Computer Science and Engineering" />
+        </div>
+
+        <div class="field full"><label>Submitted To (labels won't show on page)</label></div>
+
+        <div class="field">
+          <label>Teacher 1 Name</label>
+          <input data-bind="t1Name" value="Prof. Dr. Md. Samsuzzaman" />
+        </div>
+        <div class="field">
+          <label>Teacher 1 Department</label>
+          <input data-bind="t1Dept" value="Department of CCE" />
+        </div>
+
+        <div class="field">
+          <label>Teacher 2 Name (optional)</label>
+          <input data-bind="t2Name" placeholder="Leave blank if 1 teacher" />
+        </div>
+        <div class="field">
+          <label>Teacher 2 Department (optional)</label>
+          <input data-bind="t2Dept" placeholder="Leave blank if 1 teacher" />
+        </div>
+
+        <div class="field full">
+          <label>Faculty (To)</label>
+          <input data-bind="toFaculty" value="Faculty of Computer Science and Engineering" />
+        </div>
+
+        <div class="field full">
+          <label>Footer Date & Time (auto)</label>
+          <input data-bind="footerDT" id="footerDTInput" />
+        </div>
+      </div>
+
+      <div class="note" id="printNote">
+        PDF-এ উপরে file:///… আর date/time না চাইলে: Ctrl+P → More settings → <b>Headers and footers OFF</b> করো।
+      </div>
+    </div>
+
+    <!-- Preview -->
+    <!-- ✅ ADDED ONLY: wrapper for mobile pan/scroll -->
+    <div class="pageViewport">
+      <div class="page" id="page">
+        <div class="watermark" id="wmLayer">
+          <img id="wmImg" alt="Watermark" />
+        </div>
+
+        <div class="content">
+          <div class="logoRow">
+            <img id="logoImg" class="logo" alt="Logo" />
+          </div>
+
+          <div class="uni" id="uniNamePreview"></div>
+          <div class="titleBig">ASSIGNMENT</div>
+
+          <div class="metaCenter">
+            <div class="line"><span class="k">Assignment No:</span> <span id="assignmentNoPreview"></span></div>
+            <div class="line"><span class="k">Course Code:</span> <span id="courseCodePreview"></span></div>
+            <div class="line"><span class="k">Course Title:</span> <span id="courseTitlePreview"></span></div>
+            <div class="sub">Level <span id="levelPreview"></span>; Semester <span id="semesterPreview"></span></div>
+
+            <!-- Topic (middle align) -->
+            <div class="topicWrap" id="topicWrap">
+              <div class="topicChip"><span class="k">Topic:</span> <span id="topicPreview"></span></div>
+            </div>
+          </div>
+
+          <div class="stack">
+            <div class="box" id="byBox">
+              <div class="boxTitle by">SUBMITTED BY</div>
+
+              <div class="byContent">
+                <div class="byLine"><span class="k">Name:</span> <span id="byNamePreview"></span></div>
+                <div class="byLine"><span class="k">ID No:</span> <span id="byIdPreview"></span></div>
+                <div class="byLine"><span class="k">Reg No:</span> <span id="byRegPreview"></span></div>
+                <div class="byLine"><span class="k">Session:</span> <span id="bySessionPreview"></span></div>
+
+                <div class="byLine" id="byDeptLine"><span class="k">Department:</span> <span id="byDeptPreview"></span></div>
+              </div>
+
+              <div class="byFaculty" id="byFacultyPreview"></div>
+            </div>
+
+            <div class="box" id="toBox">
+              <div class="boxTitle to">SUBMITTED TO</div>
+
+              <div class="toGrid">
+                <div class="toCard" id="t1Card">
+                  <div class="toName" id="t1NamePreview"></div>
+                  <div class="toDept" id="t1DeptPreview"></div>
+                </div>
+
+                <div class="toCard" id="t2Card">
+                  <div class="toName" id="t2NamePreview"></div>
+                  <div class="toDept" id="t2DeptPreview"></div>
+                </div>
+              </div>
+
+              <div class="toFaculty" id="toFacultyPreview"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="footerDT" id="footerDTPreview"></div>
+      </div>
+    </div>
+  </div>
+
+<script>
+  const logoInput = document.getElementById('logoInput');
+  const logoImg = document.getElementById('logoImg');
+  const wmLayer = document.getElementById('wmLayer');
+  const wmImg = document.getElementById('wmImg');
+  const wmToggle = document.getElementById('wmToggle');
+  const wmOpacity = document.getElementById('wmOpacity');
+  const printNote = document.getElementById('printNote');
+
+  const bindEls = Array.from(document.querySelectorAll('[data-bind]'));
+  const tas = Array.from(document.querySelectorAll('[data-ta]'));
+
+  function autosizeTA(ta){
+    ta.style.height = "auto";
+    ta.style.height = (ta.scrollHeight) + "px";
+  }
+  tas.forEach(ta => {
+    autosizeTA(ta);
+    ta.addEventListener('input', () => autosizeTA(ta));
+  });
+
+  function getVal(key){
+    const el = bindEls.find(x => x.dataset.bind === key);
+    return el ? (el.value ?? "") : "";
+  }
+
+  function niceNow(){
+    return new Date().toLocaleString(undefined, {
+      year:"2-digit", month:"numeric", day:"numeric",
+      hour:"numeric", minute:"2-digit"
+    });
+  }
+
+  function setWatermarkOpacity(){
+    const op = Number(wmOpacity.value) / 100; // 0..0.25
+    document.documentElement.style.setProperty('--wmOpacity', op.toFixed(3));
+  }
+  function syncWatermarkToggle(){
+    wmLayer.classList.toggle('off', !wmToggle.checked);
+  }
+
+  function updatePreview(){
+    document.getElementById('uniNamePreview').textContent = getVal('uniName');
+    document.getElementById('assignmentNoPreview').textContent = getVal('assignmentNo');
+    document.getElementById('courseCodePreview').textContent = getVal('courseCode');
+    document.getElementById('courseTitlePreview').textContent = getVal('courseTitle');
+    document.getElementById('levelPreview').textContent = getVal('level');
+    document.getElementById('semesterPreview').textContent = getVal('semester');
+
+    // Topic
+    const topic = getVal('topic').trim();
+    document.getElementById('topicPreview').textContent = topic;
+    document.getElementById('topicWrap').style.display = topic ? "block" : "none";
+
+    // Submitted By
+    document.getElementById('byNamePreview').textContent = getVal('byName').trim();
+    document.getElementById('byIdPreview').textContent = getVal('byId').trim();
+    document.getElementById('byRegPreview').textContent = getVal('byReg').trim();
+    document.getElementById('bySessionPreview').textContent = getVal('bySession').trim();
+
+    const dept = getVal('byDept').trim();
+    document.getElementById('byDeptPreview').textContent = dept;
+    document.getElementById('byDeptLine').classList.toggle('hide', !dept);
+
+    // Faculty always show
+    document.getElementById('byFacultyPreview').textContent = getVal('byFaculty').trim();
+
+    // Submitted To (labels hidden on page)
+    const t1Name = getVal('t1Name').trim();
+    const t1Dept = getVal('t1Dept').trim();
+    const t2Name = getVal('t2Name').trim();
+    const t2Dept = getVal('t2Dept').trim();
+
+    document.getElementById('t1NamePreview').textContent = t1Name;
+    document.getElementById('t1DeptPreview').textContent = t1Dept;
+
+    document.getElementById('t2NamePreview').textContent = t2Name;
+    document.getElementById('t2DeptPreview').textContent = t2Dept;
+
+    const showT2 = !!(t2Name || t2Dept);
+    document.getElementById('t2Card').style.display = showT2 ? "block" : "none";
+
+    document.getElementById('toFacultyPreview').textContent = getVal('toFaculty').trim();
+
+    // Footer
+    document.getElementById('footerDTPreview').textContent = getVal('footerDT').trim();
+  }
+
+  bindEls.forEach(el => el.addEventListener('input', updatePreview));
+
+  wmOpacity.addEventListener('input', setWatermarkOpacity);
+  wmToggle.addEventListener('change', syncWatermarkToggle);
+
+  // logo upload -> top logo + watermark
+  logoInput.addEventListener('change', (e) => {
+    const file = e.target.files?.[0];
+    if(!file) return;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataUrl = reader.result;
+      logoImg.src = dataUrl;
+      logoImg.style.display = "block";
+
+      wmImg.src = dataUrl;
+      wmImg.style.display = "block";
+
+      syncWatermarkToggle();
+    };
+    reader.readAsDataURL(file);
+  });
+
+  document.getElementById('printBtn').addEventListener('click', () => {
+    printNote.style.display = "block";
+    window.print();
+  });
+  document.getElementById('resetBtn').addEventListener('click', () => location.reload());
+
+  // init
+  document.getElementById('footerDTInput').value = niceNow();
+  setWatermarkOpacity();
+  syncWatermarkToggle();
+  updatePreview();
+</script>
+</body>
+</html>
