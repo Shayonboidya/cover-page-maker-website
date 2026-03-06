@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>শুভ জন্মদিন, নিতু!</title>
+  <link href="https://fonts.googleapis.com/css2?family=Kalnia:wght@500&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Kalnia', serif;
+      background: linear-gradient(to top right, #ffdee9, #b5fffc);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+      position: relative;
+    }
+    .card {
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 20px;
+      box-shadow: 0 0 25px rgba(0,0,0,0.2);
+      padding: 30px;
+      max-width: 500px;
+      text-align: center;
+      z-index: 10;
+    }
+    h1 {
+      color: #e91e63;
+      font-size: 28px;
+    }
+    .message {
+      font-size: 16px;
+      color: #333;
+      margin-top: 20px;
+      white-space: pre-wrap;
+    }
+    .message2 {
+      font-size: 16px;
+      color: #333;
+      margin-top: 20px;
+      white-space: pre-wrap;
+      display: none; /* Hide the second message initially */
+    }
+    .button {
+      margin-top: 25px;
+      padding: 10px 20px;
+      background: #e91e63;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .button:hover {
+      background: #ad1457;
+    }
+    .cake {
+      font-size: 40px;
+      display: none;
+      margin-top: 20px;
+    }
+    .confetti, .flowers {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 1;
+    }
+    .confetti span, .flowers span {
+      position: absolute;
+      width: 15px;
+      height: 15px;
+      background: pink;
+      border-radius: 50%;
+      animation: fall 5s infinite;
+      opacity: 0.7;
+    }
+    @keyframes fall {
+      to {
+        transform: translateY(100vh) rotate(360deg);
+        opacity: 0;
+      }
+    }
+    .image-box {
+      margin-top: 20px;
+      display: none;
+      animation: fadeIn 2s ease-in-out forwards;
+    }
+    .image-box img {
+      width: 150px;
+      border-radius: 50%;
+      box-shadow: 0 0 15px rgba(0,0,0,0.3);
+      transform: scale(0.8);
+      transition: transform 0.5s ease-in-out;
+    }
+    .image-box img:hover {
+      transform: scale(1);
+    }
+    @keyframes fadeIn {
+      0% { opacity: 0; transform: translateY(20px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <audio id="backgroundMusic" loop>
+    <source src="https://cdn.pixabay.com/download/audio/2023/03/05/audio_29365519f4.mp3?filename=romantic-piano-loop-144191.mp3" type="audio/mpeg">
+    আপনার ব্রাউজার অডিও সাপোর্ট করে না।
+  </audio>
+
+  <div class="confetti" id="confetti"></div>
+  <div class="flowers" id="flowers"></div>
+  <div class="card">
+    <h1>শুভ জন্মদিন, নিতু! </h1>
+    <div class="image-box" id="imageBox">
+      <img src="nitu.jpg" alt="নিতুর ছবি">
+    </div>
+    <div class="message" id="message"></div>
+    <div class="message2" id="message2"></div> <!-- Hide the second message initially -->
+    <div class="cake" id="cake">  
+      <span>🎂</span> <span>🕯️</span>
+    </div>
+    <button class="button" onclick="startMusicAndShowMessage()">click</button>
+  </div>
+
+  <script>
+    const msg1 = `শুভ জন্মদিন, নিতু!
+আজকের এই বিশেষ দিনে তোমার জীবনের প্রতিটা মুহূর্ত ভালোবাসা, সুখ আর স্বপ্নে ভরে উঠুক।
+তুমি শুধু আমার জীবনে না, আমার প্রতিটা দিনে, ভাবনায়, আর হাসিতে জায়গা করে নিয়েছো।
+তোমার হাসিটা যেন চিরকাল ঠিক এমনই থাকে—নির্ভেজাল, মায়াবী আর মন ছুঁয়ে যাওয়ার মতো।
+তোমার পাশে থাকতে পেরে নিজেকে সৌভাগ্যবান মনে হয়।
+এই জন্মদিনে একটাই চাওয়া—তুমি যেন চিরকাল আমার থাকো, ঠিক যেমন করে আজ আছো।
+ভালোবাসি, নিতু। শুভ জন্মদিন।
+
+- শাওন বৈদ্য
+
+সারা জীবন এইভাবে হাসিখুশি থেকো.`;
+
+    const msg2 = `শুভ জন্মদিন, নিতু!
+আজকের দিনটা তোমার জীবনে অসংখ্য হাসি, ভালোবাসা  আর শান্তি বয়ে আনুক।
+তুমি যেমন মায়াবী, তেমনি থাকো সবসময়।
+তোমার মুখের হাসিটা যেন কখনোই ম্লান না হয়।
+তোমার এই বিশেষ দিনে আমার তরফ থেকে অনেক অনেক শুভকামন।
+তুমি আমার কাছে খুব স্পেশাল ।`;
+
+    let clicked = false;
+
+    function startMusicAndShowMessage() {
+      const music = document.getElementById('backgroundMusic');
+      
+      // Check if music is already playing
+      if (music.paused) {
+        music.play(); // Play the music if it's paused
+      }
+
+      if (clicked) return;
+      clicked = true;
+      document.getElementById("cake").style.display = 'block';
+      document.getElementById("imageBox").style.display = 'block';
+      let i = 0;
+      const typeEffect = () => {
+        if (i < msg1.length) {
+          document.getElementById("message").innerText += msg1.charAt(i);
+          i++;
+          setTimeout(typeEffect, 40);
+        } else {
+          showSecondMessage();
+        }
+      }
+      typeEffect();
+      startConfetti();
+      startFlowers();
+    }
+
+    function showSecondMessage() {
+      // Wait before showing the second message after first finishes
+      let j = 0;
+      const target = document.getElementById("message2");
+      setTimeout(() => {
+        target.style.display = 'block'; // Show the second message
+        const typeEffect = () => {
+          if (j < msg2.length) {
+            target.innerText += msg2.charAt(j);
+            j++;
+            setTimeout(typeEffect, 40);
+          }
+        };
+        setTimeout(typeEffect, 1000);
+      }, 1000); // Delay before showing the second message
+    }
+
+    function startConfetti() {
+      const confetti = document.getElementById('confetti');
+      for (let i = 0; i < 80; i++) {
+        const span = document.createElement('span');
+        span.style.left = Math.random() * 100 + 'vw';
+        span.style.animationDelay = Math.random() * 3 + 's';
+        span.style.backgroundColor = '#' + Math.floor(Math.random()*16777215).toString(16);
+        confetti.appendChild(span);
+      }
+    }
+
+    function startFlowers() {
+      const flowers = document.getElementById('flowers');
+      for (let i = 0; i < 60; i++) {
+        const span = document.createElement('span');
+        span.style.left = Math.random() * 100 + 'vw';
+        span.style.animationDelay = Math.random() * 5 + 's';
+        span.style.backgroundColor = '#ffb6c1';
+        flowers.appendChild(span);
+      }
+    }
+  </script>
+</body>
+</html>
